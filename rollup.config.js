@@ -1,14 +1,17 @@
 import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import commonjs from '@rollup/plugin-commonjs';
+import autoPreprocess from 'svelte-preprocess';
 import svelte from 'rollup-plugin-svelte';
 import babel from '@rollup/plugin-babel';
+import typescript from '@rollup/plugin-typescript';
 import { terser } from 'rollup-plugin-terser';
 import config from 'sapper/config/rollup.js';
 import pkg from './package.json';
 
 const mode = process.env.NODE_ENV;
 const dev = mode === 'development';
+const prod = mode === 'production';
 const legacy = !!process.env.SAPPER_LEGACY_BUILD;
 
 const onwarn = (warning, onwarn) =>
@@ -28,8 +31,10 @@ export default {
 			svelte({
 				dev,
 				hydratable: true,
-				emitCss: true
+				emitCss: true,
+				preprocess: autoPreprocess()
 			}),
+			typescript({ sourceMap: !prod }),
 			resolve({
 				browser: true,
 				dedupe: ['svelte']
